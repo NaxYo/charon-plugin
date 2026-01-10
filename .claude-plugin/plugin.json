@@ -1,0 +1,21 @@
+{
+  "name": "charon",
+  "description": "Event-driven workflows for Claude Code - await external events, schedule tasks, chain workflows",
+  "version": "1.0.0",
+  "author": {
+    "name": "NaxYo",
+    "email": "nax@nax.dev"
+  },
+  "repository": "https://github.com/NaxYo/charon-plugin.git",
+  "homepage": "https://github.com/NaxYo/charon",
+  "license": "MIT",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "charon",
+    "workflows",
+    "webhooks",
+    "events",
+    "plugin"
+  ]
+}
