@@ -9,6 +9,8 @@ When you need to wait for an external event before continuing:
 
 ## Prerequisites - Ensure Charon is Running
 
+**IMPORTANT:** All `npx charon-hooks` commands work from ANY directory. Do NOT cd anywhere.
+
 1. Check if config exists at `~/.charon/config/config.yaml`
    - If no config exists, Charon is not set up. Run `npx charon-hooks` to initialize.
 
