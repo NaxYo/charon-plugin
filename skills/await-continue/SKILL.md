@@ -40,10 +40,16 @@ When you need to wait for an external event before continuing:
          cli_template: "npx charon-hooks --resolve {promise_uuid} --description '{description}'"
    ```
 
-3. **Start the wait command** (it will output the webhook URL to stderr):
+3. **Start the wait command as a background task** using Bash tool's `run_in_background: true`:
    ```bash
-   npx charon-hooks --wait <uuid> --trigger <trigger-id> &
+   npx charon-hooks --wait <uuid> --trigger <trigger-id>
    ```
+
+   **CRITICAL:**
+   - Use the Bash tool with `run_in_background: true` parameter - do NOT use shell `&`
+   - Do NOT add any sleep commands or additional waiting logic after this command
+   - The subprocess will appear in Claude Code's footer immediately when run correctly
+
    Output (stderr):
    ```
    [charon] Webhook URL: http://localhost:3000/api/webhook/<trigger-id>/<uuid>
@@ -52,7 +58,9 @@ When you need to wait for an external event before continuing:
 
 4. **Tell the user** the webhook URL and what event will resume execution
 
-5. When the webhook fires, the wait command outputs the **description to stdout** and exits
+5. **Stop and wait for the user** - do not continue working until the webhook fires
+
+6. When the webhook fires, the wait command outputs the **description to stdout** and exits
 
 ## Cleanup
 
@@ -77,9 +85,9 @@ triggers:
 
 Then:
 1. Generate UUID: `uuid=$(uuidgen)`
-2. Start wait: `npx charon-hooks --wait $uuid --trigger github-pr-reviewed &`
+2. Start wait with `run_in_background: true`: `npx charon-hooks --wait $uuid --trigger github-pr-reviewed`
 3. The command prints the webhook URL - configure GitHub to POST there
-4. The wait command blocks until the webhook fires
+4. Tell the user the URL and stop - do NOT add sleep commands or continue working
 5. When PR is reviewed, the wait command outputs the description and exits
 
 ## Key Points
@@ -89,6 +97,14 @@ Then:
 - No need to read config files or construct URLs manually
 
 ## Troubleshooting
+
+### Subprocess not appearing in footer immediately?
+
+If the wait command doesn't show as a subprocess in Claude Code's footer:
+- You MUST use Bash tool's `run_in_background: true` parameter
+- Do NOT use shell `&` to background the command
+- Do NOT add `sleep` commands after launching the wait command
+- The subprocess should appear immediately - if it doesn't, re-run with correct parameters
 
 ### Service won't start?
 
