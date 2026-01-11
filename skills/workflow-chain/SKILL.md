@@ -9,17 +9,18 @@ Set up workflows where external events automatically trigger new Claude Code ses
 
 ## Prerequisites - Ensure Charon is Running
 
-1. Check if config exists at `~/.charon/config/config.yaml`
-   - If no config exists, Charon is not set up. Run `npx charon-hooks` to initialize.
+**IMPORTANT:** All `npx charon-hooks` commands work from ANY directory. Do NOT cd anywhere.
 
-2. Read the port from config file
-
-3. Check if Charon is running on that port:
+1. Check if Charon is running:
    ```bash
-   curl -s http://localhost:<port>/api/triggers
+   npx charon-hooks --service status
    ```
-   - If responds, Charon is running. Proceed.
-   - If connection refused, start Charon: `npx charon-hooks --service start`
+   This outputs JSON: `{"running": true/false, "port": ..., "url": ..., "webhook_base": ...}`
+
+2. If not running, start it:
+   ```bash
+   npx charon-hooks --service start
+   ```
 
 ## Setting Up a Workflow
 
@@ -62,9 +63,9 @@ triggers:
       working_dir: "/home/user/myapp"
 ```
 
-Configure your CI to POST to:
+Get the webhook URL from `--service status` output (uses `webhook_base` field):
 ```
-POST http://<host>:<port>/api/webhook/ci-deploy
+POST <webhook_base>/ci-deploy
 Content-Type: application/json
 
 {

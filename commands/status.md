@@ -6,18 +6,20 @@ Check if Charon is running and show configured triggers.
 
 ## Steps
 
-1. Read `~/.charon/config/config.yaml` for the port configuration
-   - If file doesn't exist, report that Charon is not configured
+1. Check Charon status:
+   ```bash
+   npx charon-hooks --service status
+   ```
+   This outputs JSON: `{"running": true/false, "port": ..., "url": ..., "webhook_base": ...}`
 
-2. Try to reach Charon at `http://localhost:<port>/api/triggers`
+2. Report status based on the `running` field:
+   - If `running: true`: "Charon is running on port <port>" (include `url` and `webhook_base`)
+   - If `running: false`: "Charon is not running. Start with: `npx charon-hooks --service start`"
 
-3. Report status:
-   - If responds: "Charon is running on port <port>"
-   - If fails: "Charon is not running"
-
-4. If running, list the configured triggers with their:
+3. If running, fetch triggers from `<url>/api/triggers` and list:
    - ID
    - Name
    - Type (webhook/cron)
    - Enabled status
    - For cron: schedule expression
+   - For webhooks: full URL using `webhook_base`

@@ -9,17 +9,18 @@ Schedule Claude Code tasks to run at specific times, either recurring or one-off
 
 ## Prerequisites - Ensure Charon is Running
 
-1. Check if config exists at `~/.charon/config/config.yaml`
-   - If no config exists, Charon is not set up. Run `npx charon-hooks` to initialize.
+**IMPORTANT:** All `npx charon-hooks` commands work from ANY directory. Do NOT cd anywhere.
 
-2. Read the port from config file
-
-3. Check if Charon is running on that port:
+1. Check if Charon is running:
    ```bash
-   curl -s http://localhost:<port>/api/triggers
+   npx charon-hooks --service status
    ```
-   - If responds, Charon is running. Proceed.
-   - If connection refused, start Charon: `npx charon-hooks --service start`
+   This outputs JSON: `{"running": true/false, "port": ..., "url": ..., "webhook_base": ...}`
+
+2. If not running, start it:
+   ```bash
+   npx charon-hooks --service start
+   ```
 
 ## Setting Up a Scheduled Task
 
@@ -140,11 +141,8 @@ Plus any static context you define in the trigger.
 
 ## Managing Scheduled Tasks
 
-View all scheduled tasks:
-```bash
-curl -s http://localhost:3000/api/triggers | jq '.triggers[] | select(.type == "cron")'
-```
+View all cron triggers via the Charon dashboard at the URL from `--service status`.
 
-Disable a task (set enabled to false in triggers.yaml or via API).
+Disable a task (set enabled to false in triggers.yaml or via dashboard).
 
-Delete a task (remove from triggers.yaml).
+Delete a task (remove from triggers.yaml or via dashboard).

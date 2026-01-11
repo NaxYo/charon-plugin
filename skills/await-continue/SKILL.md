@@ -11,18 +11,16 @@ When you need to wait for an external event before continuing:
 
 **IMPORTANT:** All `npx charon-hooks` commands work from ANY directory. Do NOT cd anywhere.
 
-1. Check if config exists at `~/.charon/config/config.yaml`
-   - If no config exists, Charon is not set up. Run `npx charon-hooks` to initialize.
-
-2. Read the port from config file
-
-3. Check if Charon is running on that port:
+1. Check if Charon is running:
    ```bash
-   curl -s http://localhost:<port>/api/triggers
+   npx charon-hooks --service status
    ```
-   - If responds, Charon is running. Proceed.
-   - If connection refused, start Charon: `npx charon-hooks --service start`
-   - Wait for it to be ready before proceeding
+   This outputs JSON: `{"running": true/false, "port": ..., "url": ..., "webhook_base": ...}`
+
+2. If not running, start it:
+   ```bash
+   npx charon-hooks --service start
+   ```
 
 ## Steps
 
@@ -42,19 +40,19 @@ When you need to wait for an external event before continuing:
          cli_template: "npx charon-hooks --resolve {promise_uuid} --description '{description}'"
    ```
 
-3. **Start background task** that waits:
+3. **Start the wait command** (it will output the webhook URL to stderr):
    ```bash
    npx charon-hooks --wait <uuid> --trigger <trigger-id> &
    ```
-
-4. **Configure external webhook** to point to:
+   Output (stderr):
    ```
-   http://<charon-host>:<port>/api/webhook/<trigger-id>/<uuid>
+   [charon] Webhook URL: http://localhost:3000/api/webhook/<trigger-id>/<uuid>
+   [charon] Waiting for webhook...
    ```
 
-5. **Tell the user** you're waiting and what event will resume execution
+4. **Tell the user** the webhook URL and what event will resume execution
 
-6. When the background task completes, **continue with the result** (the description output)
+5. When the webhook fires, the wait command outputs the **description to stdout** and exits
 
 ## Cleanup
 
@@ -80,14 +78,12 @@ triggers:
 Then:
 1. Generate UUID: `uuid=$(uuidgen)`
 2. Start wait: `npx charon-hooks --wait $uuid --trigger github-pr-reviewed &`
-3. Configure GitHub webhook to: `http://your-server:3000/api/webhook/github-pr-reviewed/$uuid`
-4. The wait command will block until the webhook fires
+3. The command prints the webhook URL - configure GitHub to POST there
+4. The wait command blocks until the webhook fires
 5. When PR is reviewed, the wait command outputs the description and exits
 
-## Webhook URL Format
+## Key Points
 
-```
-POST http://<host>:<port>/api/webhook/<trigger-id>/<uuid>
-```
-
-The UUID connects the specific wait operation to the incoming webhook, ensuring the right Claude session receives the event.
+- `--service status` returns JSON with `webhook_base` URL (uses tunnel if active)
+- `--wait` prints the full webhook URL to stderr automatically
+- No need to read config files or construct URLs manually
