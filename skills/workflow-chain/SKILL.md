@@ -119,3 +119,48 @@ template: "Deploy {repo} branch {branch}. CI run: {run_url}"
 ## Security Note
 
 The `--dangerously-skip-permissions` flag allows Claude to execute without confirmation prompts. Only use this in trusted environments and ensure your webhook endpoints are properly secured.
+
+## Troubleshooting
+
+### Service won't start?
+
+```bash
+# Run in foreground to see actual errors:
+npx charon-hooks
+
+# Check if port 3000 is already in use:
+lsof -i :3000
+```
+
+### Webhook not triggering?
+
+1. Verify the trigger exists and is enabled in `~/.charon/config/triggers.yaml`
+2. Check the webhook URL is correct (get from `npx charon-hooks --service status`)
+3. Test manually:
+   ```bash
+   curl -X POST http://localhost:3000/api/webhook/<trigger-id> \
+     -H "Content-Type: application/json" \
+     -d '{"test": "data"}'
+   ```
+4. Check recent runs: `curl http://localhost:3000/api/runs | jq`
+
+### Template placeholders not replaced?
+
+1. Ensure your sanitizer returns the expected keys
+2. Test sanitizer locally by checking run details in the API
+3. For `passthrough` sanitizer, keys come directly from the JSON payload
+
+### Sanitizer returning null (event skipped)?
+
+This is intentional - sanitizers return `null` to skip events. If unexpected:
+1. Check your sanitizer logic
+2. Verify the webhook payload matches what your sanitizer expects
+
+### Quick health check
+
+```bash
+# Check service is responding:
+curl http://localhost:3000/api/triggers
+
+# Should return JSON with your triggers, not HTML
+```

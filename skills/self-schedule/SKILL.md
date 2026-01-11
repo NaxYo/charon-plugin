@@ -146,3 +146,37 @@ View all cron triggers via the Charon dashboard at the URL from `--service statu
 Disable a task (set enabled to false in triggers.yaml or via dashboard).
 
 Delete a task (remove from triggers.yaml or via dashboard).
+
+## Troubleshooting
+
+### Service won't start?
+
+```bash
+# Run in foreground to see actual errors:
+npx charon-hooks
+
+# Check if port 3000 is already in use:
+lsof -i :3000
+```
+
+### Cron job not firing?
+
+1. Check the trigger is enabled in `~/.charon/config/triggers.yaml`
+2. Verify the cron expression is valid (use https://crontab.guru to test)
+3. Check service is running: `npx charon-hooks --service status`
+4. View recent runs: `curl http://localhost:3000/api/runs | jq`
+
+### Task runs but Claude doesn't execute?
+
+1. Verify `cli_template` is correct in the trigger config
+2. Check that `claude` CLI is installed and in PATH
+3. Test manually: `claude --dangerously-skip-permissions --task "test"`
+
+### Quick health check
+
+```bash
+# Check service is responding:
+curl http://localhost:3000/api/triggers
+
+# Should return JSON with your triggers, not HTML
+```

@@ -87,3 +87,43 @@ Then:
 - `--service status` returns JSON with `webhook_base` URL (uses tunnel if active)
 - `--wait` prints the full webhook URL to stderr automatically
 - No need to read config files or construct URLs manually
+
+## Troubleshooting
+
+### Service won't start?
+
+```bash
+# Run in foreground to see actual errors:
+npx charon-hooks
+
+# Check if port 3000 is already in use:
+lsof -i :3000
+```
+
+### "Connection refused" or "fetch failed"?
+
+The `--wait` command automatically retries for ~5 seconds if the service isn't ready yet.
+If it still fails:
+
+```bash
+# Verify service is running:
+npx charon-hooks --service status
+
+# Should return JSON like: {"running": true, "port": 3000, ...}
+# If running is false, start the service first.
+```
+
+### Quick health check
+
+```bash
+# This should return JSON, not HTML:
+curl http://localhost:3000/api/promise
+
+# Expected: {"promises": [...]}
+```
+
+### Service starts but webhook doesn't work?
+
+1. Check the trigger exists in `~/.charon/config/triggers.yaml`
+2. Verify the trigger ID matches what you're using
+3. Check service logs by running in foreground: `npx charon-hooks`

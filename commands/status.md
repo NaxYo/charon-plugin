@@ -23,3 +23,17 @@ Check if Charon is running and show configured triggers.
    - Enabled status
    - For cron: schedule expression
    - For webhooks: full URL using `webhook_base`
+
+## Troubleshooting
+
+If `--service status` shows `running: false` but you expected it to be running:
+
+```bash
+# Check if something else is on port 3000:
+lsof -i :3000
+
+# Try starting in foreground to see errors:
+npx charon-hooks
+```
+
+If the command hangs or times out, the service may have crashed. Check by running it directly.

@@ -1,7 +1,7 @@
 {
   "name": "charon",
   "description": "Event-driven workflows for Claude Code - await external events, schedule tasks, chain workflows",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "NaxYo",
     "email": "nax@nax.dev"
